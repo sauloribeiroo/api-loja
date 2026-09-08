@@ -18,8 +18,11 @@ default: &default
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  # Windows nao tem socket de dominio, entao a conexao e sempre via TCP.
-  # Os valores vem de variaveis de ambiente para nao deixar senha no repositorio.
+
+# Conexao local (Windows nao tem socket de dominio, entao precisa ser via TCP).
+# Fica separado do default de proposito: em producao a conexao vem da DATABASE_URL
+# que o Render fornece, e um host fixo aqui sobrescreveria o host remoto.
+local_connection: &local_connection
   host: <%= ENV.fetch("DB_HOST", "localhost") %>
   port: <%= ENV.fetch("DB_PORT", 5432) %>
   username: <%= ENV.fetch("DB_USER", "postgres") %>
@@ -27,7 +30,7 @@ default: &default
 
 
 development:
-  <<: *default
+  <<: [ *default, *local_connection ]
   database: api_loja_development
 
   # The specified database role being used to connect to PostgreSQL.
@@ -61,7 +64,7 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
+  <<: [ *default, *local_connection ]
   database: api_loja_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
