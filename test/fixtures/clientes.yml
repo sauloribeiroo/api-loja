@@ -1,11 +1,15 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+#
+# Fixtures sao inseridas direto no banco, sem passar pelas validacoes do model.
+# Por isso os dados precisam respeitar as regras na mao: emails diferentes entre si
+# (indice unico) e nome com no minimo 3 caracteres.
 
 one:
-  nome: MyString
-  email: MyString
-  telefone: MyString
+  nome: Ana Souza
+  email: ana.souza@exemplo.com
+  telefone: "11988887777"
 
 two:
-  nome: MyString
-  email: MyString
-  telefone: MyString
+  nome: Bruno Lima
+  email: bruno.lima@exemplo.com
+  telefone: "11977776666"
