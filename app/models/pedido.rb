@@ -21,6 +21,11 @@ class Pedido < ApplicationRecord
   before_save :calcular_total
 
   after_create :baixar_estoque_dos_produtos
+
+  # dependent: :destroy apaga os itens ANTES do after_destroy do pedido rodar.
+  # Por isso a lista precisa ser guardada antes, com prepend: true para este
+  # callback correr na frente da remocao dos itens.
+  before_destroy :guardar_itens_para_devolucao, prepend: true
   after_destroy :devolver_estoque_dos_produtos
 
   def calcular_total
@@ -53,7 +58,13 @@ class Pedido < ApplicationRecord
     itens.each { |item| item.produto.baixar_estoque!(item.quantidade) }
   end
 
+  def guardar_itens_para_devolucao
+    @estoque_a_devolver = itens.map { |item| [ item.produto, item.quantidade ] }
+  end
+
   def devolver_estoque_dos_produtos
-    itens.each { |item| item.produto.devolver_estoque!(item.quantidade) }
+    Array(@estoque_a_devolver).each do |produto, quantidade|
+      produto.devolver_estoque!(quantidade)
+    end
   end
 end

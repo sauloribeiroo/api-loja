@@ -114,4 +114,16 @@ class PedidosControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :no_content
   end
+
+  test "apagar pedido devolve o estoque dos produtos" do
+    # O pedido :pago tem 1 teclado e 2 mouses.
+    estoque_teclado = @teclado.estoque
+    estoque_mouse = @mouse.estoque
+
+    delete pedido_url(@pedido), as: :json
+    assert_response :no_content
+
+    assert_equal estoque_teclado + 1, @teclado.reload.estoque
+    assert_equal estoque_mouse + 2, @mouse.reload.estoque
+  end
 end

@@ -54,7 +54,7 @@ qualquer etapa falhar. Nenhum valor monetário é aceito vindo do cliente.
 | Framework | Rails 8.1 (modo `--api`) | sem views nem assets, stack enxuta que só fala JSON |
 | Banco | PostgreSQL 17+ | relacional: chaves estrangeiras, índices, transações e restrições de integridade |
 | Servidor | Puma | padrão do Rails |
-| Testes | Minitest | padrão do Rails, 27 testes |
+| Testes | Minitest | padrão do Rails, 28 testes |
 | Hospedagem | Render | deploy a partir do GitHub, com Postgres gerenciado |
 
 ---
@@ -252,7 +252,38 @@ primeiro lugar para olhar quando algo falha no deploy.
 O `email` é normalizado antes de salvar: espaços removidos e convertido para
 minúsculas. Assim `" ANA@X.COM "` e `"ana@x.com"` são o mesmo cliente.
 
+---
+
+#### `GET /clientes`
+
+Sem corpo.
+
+**Resposta `200 OK`**
+
+```json
+[
+  {
+    "id": 1,
+    "nome": "Ana Souza",
+    "email": "ana.souza@exemplo.com",
+    "telefone": "11988887777",
+    "created_at": "2026-09-10T16:15:06.136-03:00",
+    "updated_at": "2026-09-10T16:15:06.136-03:00"
+  }
+]
+```
+
+#### `GET /clientes/:id`
+
+Sem corpo.
+
+**Resposta `200 OK`** — um objeto no mesmo formato acima.
+
+**Resposta `404 Not Found`** — se o id não existir.
+
 #### `POST /clientes`
+
+**Corpo da requisição**
 
 ```json
 {
@@ -264,7 +295,7 @@ minúsculas. Assim `" ANA@X.COM "` e `"ana@x.com"` são o mesmo cliente.
 }
 ```
 
-**`201 Created`**
+**Resposta `201 Created`**
 
 ```json
 {
@@ -277,17 +308,53 @@ minúsculas. Assim `" ANA@X.COM "` e `"ana@x.com"` são o mesmo cliente.
 }
 ```
 
-**`422`** — nome curto, email inválido ou email já cadastrado.
+**Resposta `422 Unprocessable Content`**
+
+```json
+{
+  "errors": [
+    "Nome is too short (minimum is 3 characters)",
+    "Email nao e um email valido"
+  ]
+}
+```
+
+#### `PATCH /clientes/:id`
+
+Envie **apenas** os campos que quer mudar — os demais permanecem como estão.
+
+**Corpo da requisição**
+
+```json
+{
+  "cliente": {
+    "telefone": "11933332222"
+  }
+}
+```
+
+**Resposta `200 OK`** — o cliente atualizado.
+
+**Resposta `422`** — se algum campo ficar inválido (por exemplo, email já usado
+por outro cliente).
 
 #### `DELETE /clientes/:id`
 
-**`204 No Content`** se o cliente não tem pedidos.
+Sem corpo.
 
-**`422`** se tiver:
+**Resposta `204 No Content`** — removido. Só funciona se o cliente não tiver
+pedidos.
+
+**Resposta `422`**
 
 ```json
 { "errors": ["Cannot delete record because dependent pedidos exist"] }
 ```
+
+#### `GET /clientes/:id/pedidos`
+
+Sem corpo. Rota aninhada: lista os pedidos daquele cliente, no mesmo formato de
+`GET /pedidos`.
 
 ---
 
@@ -308,12 +375,44 @@ minúsculas. Assim `" ANA@X.COM "` e `"ana@x.com"` são o mesmo cliente.
 | `nome` | string | sim | 2 a 120 caracteres |
 | `descricao` | text | não | até 1000 caracteres |
 | `preco` | decimal(10,2) | sim | maior ou igual a zero |
-| `estoque` | integer | sim | inteiro, maior ou igual a zero (padrão `0`) |
+| `estoque` | integer | não | inteiro, maior ou igual a zero (padrão `0`) |
 
 > `preco` é `decimal`, nunca `float`. Ponto flutuante tem erro de arredondamento
 > (`0.1 + 0.2 ≠ 0.3`), inaceitável para dinheiro.
 
+---
+
+#### `GET /produtos`
+
+Sem corpo.
+
+**Resposta `200 OK`**
+
+```json
+[
+  {
+    "id": 1,
+    "nome": "Teclado Mecanico",
+    "descricao": "Teclado mecanico ABNT2 com switches marrons",
+    "preco": "289.9",
+    "estoque": 25,
+    "created_at": "2026-09-10T16:15:06.282-03:00",
+    "updated_at": "2026-09-10T16:15:06.282-03:00"
+  }
+]
+```
+
+#### `GET /produtos/:id`
+
+Sem corpo.
+
+**Resposta `200 OK`** — um objeto no formato acima.
+
+**Resposta `404 Not Found`** — se o id não existir.
+
 #### `POST /produtos`
+
+**Corpo da requisição**
 
 ```json
 {
@@ -326,12 +425,48 @@ minúsculas. Assim `" ANA@X.COM "` e `"ana@x.com"` são o mesmo cliente.
 }
 ```
 
-**`201 Created`** — retorna o produto criado.
+**Resposta `201 Created`** — o produto criado, com `id` e timestamps.
+
+**Resposta `422 Unprocessable Content`**
+
+```json
+{
+  "errors": [
+    "Nome is too short (minimum is 2 characters)",
+    "Preco must be greater than or equal to 0"
+  ]
+}
+```
+
+#### `PATCH /produtos/:id`
+
+**Corpo da requisição**
+
+```json
+{
+  "produto": {
+    "preco": 319.90,
+    "estoque": 40
+  }
+}
+```
+
+**Resposta `200 OK`** — o produto atualizado.
+
+> Alterar o preço **não** muda pedidos já feitos: o `preco_unitario` deles foi
+> congelado no momento da venda.
 
 #### `DELETE /produtos/:id`
 
-**`422`** se o produto estiver em algum pedido — o histórico de vendas é
-preservado.
+Sem corpo.
+
+**Resposta `204 No Content`** — removido.
+
+**Resposta `422`** — se o produto estiver em algum pedido:
+
+```json
+{ "errors": ["Cannot delete record because dependent itens pedido exist"] }
+```
 
 ---
 
@@ -348,33 +483,20 @@ preservado.
 **Status válidos:** `pendente` (padrão), `pago`, `enviado`, `entregue`,
 `cancelado`.
 
-#### `POST /pedidos`
+---
 
-O endpoint mais importante da API. Cria o pedido e seus itens numa única
-requisição.
+#### `GET /pedidos`
 
-```json
-{
-  "pedido": {
-    "cliente_id": 1,
-    "status": "pendente",
-    "itens": [
-      { "produto_id": 1, "quantidade": 2 },
-      { "produto_id": 2, "quantidade": 1 }
-    ]
-  }
-}
-```
+Sem corpo.
 
-| Campo | Obrigatório | Observação |
-|---|---|---|
-| `cliente_id` | sim | precisa existir |
-| `status` | não | padrão `pendente` |
-| `itens` | sim | ao menos um; sem produtos repetidos |
-| `itens[].produto_id` | sim | precisa existir |
-| `itens[].quantidade` | sim | inteiro maior que zero, dentro do estoque |
+**Resposta `200 OK`** — lista de pedidos, cada um com cliente e itens embutidos,
+no mesmo formato de `GET /pedidos/:id` abaixo.
 
-**`201 Created`**
+#### `GET /pedidos/:id`
+
+Sem corpo.
+
+**Resposta `200 OK`**
 
 ```json
 {
@@ -408,33 +530,97 @@ requisição.
 }
 ```
 
-Repare: `preco_unitario`, `subtotal` e `total` **não foram enviados** — foram
-calculados. E o estoque dos produtos 1 e 2 foi reduzido em 2 e 1 unidades.
+**Resposta `404 Not Found`** — se o id não existir.
 
-**Erros possíveis (todos `422`):**
+#### `POST /pedidos`
 
-| Situação | Mensagem |
-|---|---|
-| Estoque insuficiente | `Itens quantidade indisponivel: o produto 'X' tem apenas N em estoque` |
-| Nenhum item | `Itens o pedido precisa ter ao menos um item` |
-| Produto repetido | `Itens produto repetido no mesmo pedido (X). Use quantidade...` |
-| Cliente inexistente | `Cliente must exist` |
+O endpoint mais importante da API. Cria o pedido e seus itens numa única
+requisição.
+
+**Corpo da requisição**
+
+```json
+{
+  "pedido": {
+    "cliente_id": 1,
+    "status": "pendente",
+    "itens": [
+      { "produto_id": 1, "quantidade": 2 },
+      { "produto_id": 2, "quantidade": 1 }
+    ]
+  }
+}
+```
+
+| Campo | Obrigatório | Observação |
+|---|---|---|
+| `cliente_id` | sim | precisa existir |
+| `status` | não | padrão `pendente` |
+| `itens` | sim | ao menos um; sem produtos repetidos |
+| `itens[].produto_id` | sim | precisa existir |
+| `itens[].quantidade` | sim | inteiro maior que zero, dentro do estoque |
+
+> **Nenhum preço é enviado.** A API busca o preço atual de cada produto, calcula
+> os subtotais, soma o total e baixa o estoque — tudo dentro de uma transação.
+
+**Resposta `201 Created`** — o pedido montado, no mesmo formato de
+`GET /pedidos/:id`, já com `total`, `preco_unitario` e `subtotal` calculados.
+
+**Respostas `422 Unprocessable Content`**
+
+Estoque insuficiente:
+
+```json
+{ "errors": ["Itens quantidade indisponivel: o produto 'Webcam Full HD' tem apenas 5 em estoque"] }
+```
+
+Pedido sem itens:
+
+```json
+{ "errors": ["Itens o pedido precisa ter ao menos um item"] }
+```
+
+Produto repetido:
+
+```json
+{ "errors": ["Itens produto repetido no mesmo pedido (Teclado Mecanico). Use quantidade em vez de duas linhas"] }
+```
+
+Cliente inexistente:
+
+```json
+{ "errors": ["Cliente must exist"] }
+```
 
 #### `PATCH /pedidos/:id`
 
-Apenas o `status` é editável:
+Apenas o `status` é editável. Os itens de um pedido criado não podem ser
+alterados — mexer neles desequilibraria o estoque que já foi baixado.
+
+**Corpo da requisição**
 
 ```json
-{ "pedido": { "status": "enviado" } }
+{
+  "pedido": {
+    "status": "enviado"
+  }
+}
 ```
 
-Os itens de um pedido criado não podem ser alterados — mexer neles
-desequilibraria o estoque que já foi baixado.
+**Resposta `200 OK`** — o pedido atualizado.
 
-#### `GET /clientes/:id/pedidos`
+**Resposta `422`** — status fora da lista:
 
-Rota aninhada. Mesma estrutura de resposta de `GET /pedidos`, filtrada por
-cliente.
+```json
+{ "errors": ["Status is not included in the list"] }
+```
+
+#### `DELETE /pedidos/:id`
+
+Sem corpo.
+
+**Resposta `204 No Content`** — o pedido é removido, seus itens junto, e o
+estoque dos produtos é **devolvido**.
 
 ---
 
@@ -496,7 +682,7 @@ Depois de importar, ajuste a variável `base_url` da coleção para
 ## Testes
 
 ```bash
-bin/rails test           # 27 testes
+bin/rails test           # 28 testes
 bin/rubocop              # estilo
 bin/brakeman             # análise de segurança
 ```
@@ -531,7 +717,7 @@ docs/
   banco-de-dados.md           guia do pgAdmin e SQL útil
   deploy-render.md            passo a passo do deploy
   api-loja.postman_collection.json
-test/                         27 testes
+test/                         28 testes
 bin/render-build.sh           script de build do Render
 ```
 
