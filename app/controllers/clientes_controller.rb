@@ -20,7 +20,7 @@ class ClientesController < ApplicationController
     if @cliente.save
       render json: @cliente, status: :created, location: @cliente
     else
-      render json: @cliente.errors, status: :unprocessable_content
+      render json: { errors: @cliente.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -29,7 +29,7 @@ class ClientesController < ApplicationController
     if @cliente.update(cliente_params)
       render json: @cliente
     else
-      render json: @cliente.errors, status: :unprocessable_content
+      render json: { errors: @cliente.errors.full_messages }, status: :unprocessable_content
     end
   end
 

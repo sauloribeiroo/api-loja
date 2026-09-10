@@ -20,7 +20,7 @@ class ProdutosController < ApplicationController
     if @produto.save
       render json: @produto, status: :created, location: @produto
     else
-      render json: @produto.errors, status: :unprocessable_content
+      render json: { errors: @produto.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -29,7 +29,7 @@ class ProdutosController < ApplicationController
     if @produto.update(produto_params)
       render json: @produto
     else
-      render json: @produto.errors, status: :unprocessable_content
+      render json: { errors: @produto.errors.full_messages }, status: :unprocessable_content
     end
   end
 
