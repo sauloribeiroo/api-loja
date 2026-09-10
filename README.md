@@ -1,7 +1,17 @@
 # API Loja — Ruby on Rails
 
 API REST de estudo com três recursos relacionados: **Clientes**, **Produtos** e **Pedidos**.
-Projeto para apresentação de faculdade, feito manualmente (pouco scaffold) para aprender cada etapa.
+Projeto para apresentação de faculdade.
+
+**No ar em:** https://api-loja-8xzt.onrender.com
+
+```
+GET https://api-loja-8xzt.onrender.com/produtos
+GET https://api-loja-8xzt.onrender.com/pedidos/1
+```
+
+> O plano gratuito do Render hiberna após ~15 min sem uso. A primeira
+> requisição pode demorar até 1 minuto enquanto o serviço acorda.
 
 ---
 
@@ -188,6 +198,6 @@ A API sobe em `http://localhost:3000`. Rodar os testes: `bin/rails test`.
 - [x] Regras de negócio (cálculo do total, baixa de estoque, transação)
 - [x] Seeds
 - [x] Testes automatizados (26 testes)
-- [ ] Deploy no Render
-- [ ] Coleção do Postman
-- [ ] Diagrama para a apresentação
+- [x] Deploy no Render
+- [x] Coleção do Postman ([docs/api-loja.postman_collection.json](docs/api-loja.postman_collection.json))
+- [ ] Diagrama para a apresentação (gerar pelo pgAdmin: botão direito no banco → ERD For Database)
