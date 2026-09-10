@@ -1,0 +1,274 @@
+{
+  "info": {
+    "name": "API Loja",
+    "description": "Colecao de testes da API Loja (clientes, produtos e pedidos).\n\nAntes de usar, ajuste a variavel base_url na aba Variables:\n- local:      http://localhost:3000\n- producao:   https://api-loja.onrender.com\n\nAs requisicoes estao na ordem sugerida para a apresentacao.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "cliente_id", "value": "1", "type": "string" },
+    { "key": "produto_id", "value": "1", "type": "string" },
+    { "key": "pedido_id", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0. Health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/up", "host": [ "{{base_url}}" ], "path": [ "up" ] },
+        "description": "Responde 200 se a aplicacao subiu sem erros. Primeiro lugar para olhar quando algo falha no deploy."
+      }
+    },
+    {
+      "name": "1. Clientes",
+      "item": [
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/clientes", "host": [ "{{base_url}}" ], "path": [ "clientes" ] }
+          }
+        },
+        {
+          "name": "Buscar cliente por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/clientes/{{cliente_id}}", "host": [ "{{base_url}}" ], "path": [ "clientes", "{{cliente_id}}" ] }
+          }
+        },
+        {
+          "name": "Criar cliente",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": {\n    \"nome\": \"Eduarda Nunes\",\n    \"email\": \"eduarda.nunes@exemplo.com\",\n    \"telefone\": \"11944443333\"\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/clientes", "host": [ "{{base_url}}" ], "path": [ "clientes" ] },
+            "description": "Espera 201. O email e normalizado (minusculo, sem espacos) antes de salvar."
+          }
+        },
+        {
+          "name": "Criar cliente INVALIDO (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente\": {\n    \"nome\": \"Jo\",\n    \"email\": \"sem-arroba\"\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/clientes", "host": [ "{{base_url}}" ], "path": [ "clientes" ] },
+            "description": "Nome curto demais e email invalido. Espera 422 com a lista de erros."
+          }
+        },
+        {
+          "name": "Atualizar cliente",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"cliente\": {\n    \"telefone\": \"11933332222\"\n  }\n}" },
+            "url": { "raw": "{{base_url}}/clientes/{{cliente_id}}", "host": [ "{{base_url}}" ], "path": [ "clientes", "{{cliente_id}}" ] }
+          }
+        },
+        {
+          "name": "Apagar cliente COM pedidos (422)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/clientes/{{cliente_id}}", "host": [ "{{base_url}}" ], "path": [ "clientes", "{{cliente_id}}" ] },
+            "description": "O historico de vendas nao pode sumir junto com o cadastro. Espera 422."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Produtos",
+      "item": [
+        {
+          "name": "Listar produtos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/produtos", "host": [ "{{base_url}}" ], "path": [ "produtos" ] }
+          }
+        },
+        {
+          "name": "Buscar produto por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/produtos/{{produto_id}}", "host": [ "{{base_url}}" ], "path": [ "produtos", "{{produto_id}}" ] }
+          }
+        },
+        {
+          "name": "Criar produto",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"produto\": {\n    \"nome\": \"Mousepad XL\",\n    \"descricao\": \"Mousepad 90x40cm com base antiderrapante\",\n    \"preco\": 79.90,\n    \"estoque\": 30\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/produtos", "host": [ "{{base_url}}" ], "path": [ "produtos" ] }
+          }
+        },
+        {
+          "name": "Criar produto INVALIDO (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"produto\": {\n    \"nome\": \"X\",\n    \"preco\": -5,\n    \"estoque\": -1\n  }\n}" },
+            "url": { "raw": "{{base_url}}/produtos", "host": [ "{{base_url}}" ], "path": [ "produtos" ] },
+            "description": "Preco e estoque negativos sao recusados pela validacao e pela restricao do banco."
+          }
+        },
+        {
+          "name": "Atualizar preco do produto",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"produto\": {\n    \"preco\": 319.90\n  }\n}" },
+            "url": { "raw": "{{base_url}}/produtos/{{produto_id}}", "host": [ "{{base_url}}" ], "path": [ "produtos", "{{produto_id}}" ] },
+            "description": "Depois deste PATCH, consulte um pedido antigo: o preco_unitario dele NAO muda. E o historico da venda."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Pedidos",
+      "item": [
+        {
+          "name": "Listar pedidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] }
+          }
+        },
+        {
+          "name": "Buscar pedido por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/pedidos/{{pedido_id}}", "host": [ "{{base_url}}" ], "path": [ "pedidos", "{{pedido_id}}" ] },
+            "description": "Devolve o pedido com o cliente e os itens embutidos, cada item com seu subtotal."
+          }
+        },
+        {
+          "name": "Pedidos de um cliente (rota aninhada)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/clientes/{{cliente_id}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "clientes", "{{cliente_id}}", "pedidos" ] }
+          }
+        },
+        {
+          "name": "Criar pedido com 2 produtos",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido\": {\n    \"cliente_id\": 1,\n    \"itens\": [\n      { \"produto_id\": 1, \"quantidade\": 2 },\n      { \"produto_id\": 2, \"quantidade\": 1 }\n    ]\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] },
+            "description": "A REQUISICAO PRINCIPAL DA APRESENTACAO.\n\nRepare que nenhum preco e enviado. A API busca o preco atual de cada produto no banco, calcula o subtotal, soma o total e baixa o estoque - tudo dentro de uma transacao.\n\nEspera 201. Confira o estoque dos produtos antes e depois."
+            }
+        },
+        {
+          "name": "Criar pedido SEM ESTOQUE (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido\": {\n    \"cliente_id\": 1,\n    \"itens\": [\n      { \"produto_id\": 1, \"quantidade\": 1 },\n      { \"produto_id\": 2, \"quantidade\": 99999 }\n    ]\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] },
+            "description": "DEMONSTRA A TRANSACAO.\n\nO primeiro item e valido, o segundo nao tem estoque. Espera 422 - e o estoque do PRIMEIRO produto tambem nao e alterado. Tudo ou nada."
+          }
+        },
+        {
+          "name": "Criar pedido SEM ITENS (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"pedido\": {\n    \"cliente_id\": 1,\n    \"itens\": []\n  }\n}" },
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] }
+          }
+        },
+        {
+          "name": "Criar pedido com PRODUTO REPETIDO (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido\": {\n    \"cliente_id\": 1,\n    \"itens\": [\n      { \"produto_id\": 1, \"quantidade\": 1 },\n      { \"produto_id\": 1, \"quantidade\": 2 }\n    ]\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] },
+            "description": "Duas linhas do mesmo produto sao recusadas: o certo e usar quantidade."
+          }
+        },
+        {
+          "name": "Mudar status do pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"pedido\": {\n    \"status\": \"enviado\"\n  }\n}" },
+            "url": { "raw": "{{base_url}}/pedidos/{{pedido_id}}", "host": [ "{{base_url}}" ], "path": [ "pedidos", "{{pedido_id}}" ] },
+            "description": "Status validos: pendente, pago, enviado, entregue, cancelado."
+          }
+        },
+        {
+          "name": "Status INVALIDO (422)",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"pedido\": {\n    \"status\": \"voando\"\n  }\n}" },
+            "url": { "raw": "{{base_url}}/pedidos/{{pedido_id}}", "host": [ "{{base_url}}" ], "path": [ "pedidos", "{{pedido_id}}" ] }
+          }
+        },
+        {
+          "name": "Apagar pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/pedidos/{{pedido_id}}", "host": [ "{{base_url}}" ], "path": [ "pedidos", "{{pedido_id}}" ] },
+            "description": "Espera 204. O estoque dos produtos e devolvido."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Erros",
+      "item": [
+        {
+          "name": "Cliente inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/clientes/999999", "host": [ "{{base_url}}" ], "path": [ "clientes", "999999" ] }
+          }
+        },
+        {
+          "name": "Pedido com cliente inexistente (422)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedido\": {\n    \"cliente_id\": 999999,\n    \"itens\": [ { \"produto_id\": 1, \"quantidade\": 1 } ]\n  }\n}"
+            },
+            "url": { "raw": "{{base_url}}/pedidos", "host": [ "{{base_url}}" ], "path": [ "pedidos" ] },
+            "description": "A chave estrangeira impede pedido orfao."
+          }
+        }
+      ]
+    }
+  ]
+}
