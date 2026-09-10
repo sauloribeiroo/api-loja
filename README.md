@@ -9,9 +9,9 @@ Projeto para apresentação de faculdade, feito manualmente (pouco scaffold) par
 
 | Ferramenta | Versão sugerida | Para quê |
 |---|---|---|
-| Ruby | 3.3.x | linguagem |
-| Rails | 8.x | framework da API |
-| PostgreSQL | 16.x | banco de dados relacional |
+| Ruby | 3.4.10 | linguagem |
+| Rails | 8.1.3 | framework da API |
+| PostgreSQL | 17.11 | banco de dados relacional |
 | Git | qualquer | versionamento + deploy |
 | Postman ou Insomnia | — | testar os endpoints |
 
@@ -36,12 +36,12 @@ Cliente  1 ──── N  Pedido  1 ──── N  ItemPedido  N ──── 
 | `clientes` | nome, email (único), telefone |
 | `produtos` | nome, descricao, preco (decimal), estoque (integer) |
 | `pedidos` | cliente_id (FK), status, total (decimal), data |
-| `itens_pedido` | pedido_id (FK), produto_id (FK), quantidade, preco_unitario |
+| `item_pedidos` | pedido_id (FK), produto_id (FK), quantidade, preco_unitario |
 
-A tabela `itens_pedido` é a tabela de junção — é ela que permite um pedido ter vários produtos
+A tabela `item_pedidos` é a tabela de junção — é ela que permite um pedido ter vários produtos
 e um produto aparecer em vários pedidos (relação N:N com dados extras: `quantidade` e `preco_unitario`).
 
-**`itens_pedido` não é um endpoint.** São 4 tabelas, mas continuam sendo 3 recursos na API.
+**`item_pedidos` não é um endpoint.** São 4 tabelas, mas continuam sendo 3 recursos na API.
 Os itens são enviados e devolvidos dentro do JSON do pedido:
 
 ```jsonc
@@ -162,12 +162,32 @@ O que será necessário em qualquer uma delas:
 
 ---
 
+## Guias
+
+- [Acessando o banco pelo pgAdmin](docs/banco-de-dados.md) — conectar, ver as tabelas,
+  consultas SQL úteis e como gerar o diagrama (ERD) para a apresentação
+- [Deploy no Render](docs/deploy-render.md) — passo a passo completo, variáveis de
+  ambiente e o que fazer quando falha
+
+## Como rodar localmente
+
+```bash
+bundle install
+bin/rails db:create db:migrate db:seed
+bin/rails server
+```
+
+A API sobe em `http://localhost:3000`. Rodar os testes: `bin/rails test`.
+
 ## Status
 
-- [ ] Ambiente instalado (Ruby, Rails, PostgreSQL)
-- [ ] Projeto criado
-- [ ] Migrations e models
-- [ ] Controllers e rotas
-- [ ] Regras de negócio
-- [ ] Seeds
-- [ ] Deploy
+- [x] Ambiente instalado (Ruby 3.4, Rails 8.1, PostgreSQL 17)
+- [x] Projeto criado
+- [x] Migrations e models (clientes, produtos, pedidos, item_pedidos)
+- [x] Controllers e rotas (incluindo a rota aninhada `/clientes/:id/pedidos`)
+- [x] Regras de negócio (cálculo do total, baixa de estoque, transação)
+- [x] Seeds
+- [x] Testes automatizados (26 testes)
+- [ ] Deploy no Render
+- [ ] Coleção do Postman
+- [ ] Diagrama para a apresentação
