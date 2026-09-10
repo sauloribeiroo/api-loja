@@ -1,0 +1,22 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+#
+# O indice unico (pedido_id, produto_id) impede o mesmo produto duas vezes
+# no mesmo pedido, entao cada linha aqui usa uma combinacao diferente.
+
+teclado_do_pedido_pago:
+  pedido: pago
+  produto: teclado
+  quantidade: 1
+  preco_unitario: 289.90
+
+mouse_do_pedido_pago:
+  pedido: pago
+  produto: mouse
+  quantidade: 2
+  preco_unitario: 129.90
+
+mouse_do_pedido_pendente:
+  pedido: pendente
+  produto: mouse
+  quantidade: 1
+  preco_unitario: 129.90

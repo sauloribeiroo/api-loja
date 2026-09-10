@@ -13,3 +13,9 @@ two:
   nome: Bruno Lima
   email: bruno.lima@exemplo.com
   telefone: "11977776666"
+
+# Nao participa de nenhum pedido, entao pode ser apagado nos testes.
+sem_pedidos:
+  nome: Diego Martins
+  email: diego.martins@exemplo.com
+  telefone: "11955554444"

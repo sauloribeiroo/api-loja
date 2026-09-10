@@ -46,11 +46,20 @@ class ClientesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should destroy cliente" do
+  test "should destroy cliente sem pedidos" do
     assert_difference("Cliente.count", -1) do
-      delete cliente_url(@cliente), as: :json
+      delete cliente_url(clientes(:sem_pedidos)), as: :json
     end
 
     assert_response :no_content
+  end
+
+  test "should not destroy cliente que tem pedidos" do
+    # O historico de vendas nao pode sumir junto com o cadastro do cliente.
+    assert_no_difference("Cliente.count") do
+      delete cliente_url(@cliente), as: :json
+    end
+
+    assert_response :unprocessable_content
   end
 end

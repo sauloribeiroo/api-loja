@@ -34,8 +34,14 @@ class ClientesController < ApplicationController
   end
 
   # DELETE /clientes/1
+  # Um cliente com pedidos nao pode ser apagado (restrict_with_error no model),
+  # entao respondemos 422 em vez de deixar a excecao virar 500.
   def destroy
-    @cliente.destroy!
+    if @cliente.destroy
+      head :no_content
+    else
+      render json: { errors: @cliente.errors.full_messages }, status: :unprocessable_content
+    end
   end
 
   private

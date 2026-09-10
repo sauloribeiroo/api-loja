@@ -1,4 +1,8 @@
 class Cliente < ApplicationRecord
+  # restrict_with_error impede apagar um cliente que tem pedidos:
+  # o historico de vendas nao pode sumir junto com o cadastro.
+  has_many :pedidos, dependent: :restrict_with_error
+
   # normalizes roda ANTES das validacoes, diferente de before_save.
   # Assim "  ANA@X.COM " vira "ana@x.com" e so depois e validado e comparado
   # com o indice unico do banco.
