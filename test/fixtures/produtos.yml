@@ -1,0 +1,20 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+teclado:
+  nome: Teclado Mecanico
+  descricao: Teclado mecanico ABNT2
+  preco: 289.90
+  estoque: 25
+
+mouse:
+  nome: Mouse Sem Fio
+  descricao: Mouse optico 1600 DPI
+  preco: 129.90
+  estoque: 40
+
+# Usado para testar a recusa por falta de estoque.
+esgotado:
+  nome: Monitor Ultrawide
+  descricao: Monitor 34 polegadas
+  preco: 2199.00
+  estoque: 0
