@@ -93,21 +93,13 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+# Em producao a conexao vem inteira da variavel DATABASE_URL, que o Render
+# fornece quando o banco e criado. Por isso nao ha host, usuario, senha nem
+# nome de banco aqui: qualquer valor fixo sobrescreveria o que vem da URL.
+#
+# O Rails 8 gera este bloco com quatro bancos (primary, cache, queue e cable)
+# para o Solid Cache/Queue/Cable. O plano gratuito do Render da apenas um
+# banco, entao ficou so o primary. Cache e filas usam os adaptadores em
+# memoria, configurados em config/environments/production.rb.
 production:
-  primary: &primary_production
-    <<: *default
-    database: api_loja_production
-    username: api_loja
-    password: <%= ENV["API_LOJA_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: api_loja_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: api_loja_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: api_loja_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
