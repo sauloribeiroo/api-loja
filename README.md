@@ -3,11 +3,20 @@
 API REST para gestão de **clientes**, **produtos** e **pedidos**, construída com
 Ruby on Rails e PostgreSQL.
 
-**Base URL (produção):** `https://api-loja-8xzt.onrender.com`
+A API está publicada e pronta para uso. **Não é preciso instalar nada** para
+consumi-la: qualquer cliente HTTP (Postman, Insomnia, curl) ou o navegador
+basta.
+
+**Base URL:** `https://api-loja-8xzt.onrender.com`
 
 ```bash
 curl https://api-loja-8xzt.onrender.com/produtos
 ```
+
+Ou abra direto no navegador:
+[/produtos](https://api-loja-8xzt.onrender.com/produtos) ·
+[/clientes](https://api-loja-8xzt.onrender.com/clientes) ·
+[/pedidos](https://api-loja-8xzt.onrender.com/pedidos)
 
 > ⚠️ O plano gratuito do Render hiberna após ~15 minutos sem uso. A primeira
 > requisição depois de um período parado pode levar até 1 minuto enquanto o
@@ -638,6 +647,11 @@ estoque dos produtos é **devolvido**.
 ---
 
 ## Rodando localmente
+
+> Esta seção é **opcional**. Para apenas **consumir** a API publicada, não é
+> preciso instalar nada: basta um cliente HTTP (Postman, Insomnia, curl) ou o
+> navegador, apontando para a URL de produção. As instruções abaixo servem para
+> quem quiser rodar a própria cópia do projeto e modificar o código.
 
 **Pré-requisitos:** Ruby 3.4, PostgreSQL 17+, Git.
 
